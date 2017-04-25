@@ -160,6 +160,55 @@ rtc::get_time (time_t* u_time)
 }
 
 /**
+ * @brief  Set the calibration factor.
+ * @param  cal_factor: calibration factor (from -511 to +512).
+ * @return rtc::ok if successful, or a RTC error.
+ */
+rtc::rtc_result_t
+rtc::set_cal_factor (int cal_factor)
+{
+  uint32_t calib_minus_pulses_val;
+  uint32_t calib_plus_pulses;
+  rtc::rtc_result_t result = invalid_param;
+
+  if (cal_factor >= -511 && cal_factor <= 512)
+    {
+      if (cal_factor > 0)
+        {
+          calib_minus_pulses_val = 512 - cal_factor;
+          calib_plus_pulses = RTC_SMOOTHCALIB_PLUSPULSES_SET;
+        }
+      else
+        {
+          cal_factor *= -1; // transform to absolute value
+          calib_minus_pulses_val = cal_factor;
+          calib_plus_pulses = RTC_SMOOTHCALIB_PLUSPULSES_RESET;
+        }
+      result = (rtc_result_t) HAL_RTCEx_SetSmoothCalib (
+          hrtc_, //
+          RTC_SMOOTHCALIB_PERIOD_32SEC, calib_plus_pulses,
+          calib_minus_pulses_val);
+    }
+  return result;
+}
+
+/**
+ * @brief  Get the current calibration factor.
+ * @return The current calibration factor (-511 to +512).
+ */
+int
+rtc::get_cal_factor (void)
+{
+  int cal_factor;
+  uint32_t rtc_calr = RTC->CALR;
+
+  cal_factor = (rtc_calr & 0x8000) ? 512 : 0;
+  cal_factor -= (rtc_calr & 0x1FF);
+
+  return cal_factor;
+}
+
+/**
  * @brief  Set an alarm.
  * @param  which: which alarm, for the STM32F7xxx there are two alarms, one of
  *      alarm_a or alarm_b.

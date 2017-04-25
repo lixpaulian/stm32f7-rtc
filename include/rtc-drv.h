@@ -48,6 +48,7 @@ public:
     error = HAL_ERROR,
     busy = HAL_BUSY,
     timeout = HAL_TIMEOUT,
+    invalid_param = 10,        // RTC specific
   } rtc_result_t;
 
   static constexpr int alarm_a = RTC_ALARM_A;
@@ -66,6 +67,12 @@ public:
   get_time (time_t* u_time);
 
   rtc_result_t
+  set_cal_factor (int cal_factor);
+
+  int
+  get_cal_factor (void);
+
+  rtc_result_t
   set_alarm (int which, struct tm* when);
 
   rtc_result_t
@@ -76,7 +83,7 @@ private:
   static constexpr uint32_t RTC_SYNC_PREDIV = 0x3FF;
 
   static constexpr uint8_t RTC_DRV_VERSION_MAJOR = 0;
-  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 3;
+  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 4;
 
   // Some timeouts; all timeouts are in # of uOS++ ticks (normally 1 ms)
   static constexpr uint32_t RTC_TIMEOUT = 100;
