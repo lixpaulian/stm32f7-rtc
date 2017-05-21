@@ -2,7 +2,7 @@
 This is a RTC driver for the STM32F7xx family of controllers.
 
 ## Version
-* 0.4 (25 Apr. 2017)
+* 0.5 (21 May 2017)
 
 ## License
 * MIT
@@ -21,6 +21,11 @@ Note that the hardware initialisations (uController clock, peripherals clocks, e
 * https://github.com/micro-os-plus/eclipse-demo-projects/tree/master/f746gdiscovery-blinky-micro-os-plus/cube-mx which details how to integrate the CubeMX generated code into a uOS++ based project.
 
 The driver was designed for the µOS++ ecosystem, but it can be easily ported to other RTOSes, as it uses only a mutex.
+
+## Time Zone
+The driver assumes that all date/time information is UTC (the time_t datatype refers to UTC). This might be a problem when setting the alarms, as they +must+ be also reference to UTC. For recurring alarms set at intervals defined only in seconds and minutes this is not an issue. However, if hours, days, months are used to define alarms, then the data in the tm structure must be converted to UTC.
+
+The time zone in your application should be set using the setenv () and tzset () functions. Then all standard time functions would properly operate (localtime, gmtime, mktime, etc.). The integration to your system should be made using the gettimeofday () and settimeofday () syscall functions. For uOS++ this will follow soon.
 
 ## Tests
 There is a test that must be run on a real target. For the time being, the test is doing the following:
