@@ -53,6 +53,7 @@ public:
 
   static constexpr int alarm_a = RTC_ALARM_A;
   static constexpr int alarm_b = RTC_ALARM_B;
+  static constexpr int alarm_ignored = -1;
 
   void
   get_version (uint8_t& version_major, uint8_t& version_minor);
@@ -76,6 +77,9 @@ public:
   set_alarm (int which, struct tm* when);
 
   rtc_result_t
+  get_alarm (int which, struct tm* when);
+
+  rtc_result_t
   reset_alarm (int which);
 
 private:
@@ -83,7 +87,7 @@ private:
   static constexpr uint32_t RTC_SYNC_PREDIV = 0x3FF;
 
   static constexpr uint8_t RTC_DRV_VERSION_MAJOR = 0;
-  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 4;
+  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 5;
 
   // Some timeouts; all timeouts are in # of uOS++ ticks (normally 1 ms)
   static constexpr uint32_t RTC_TIMEOUT = 100;

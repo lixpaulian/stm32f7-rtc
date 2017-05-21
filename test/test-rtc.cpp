@@ -117,10 +117,10 @@ test_rtc (void)
     trace::printf ("Failed to get the RTC date/time\n");
 
   // Set alarm A
-  tm_time.tm_hour = -1;
-  tm_time.tm_mday = -1;
-  tm_time.tm_min = -1;
-  tm_time.tm_wday = -1;
+  tm_time.tm_hour = rtc::alarm_ignored;
+  tm_time.tm_mday = rtc::alarm_ignored;
+  tm_time.tm_min = rtc::alarm_ignored;
+  tm_time.tm_wday = rtc::alarm_ignored;
   tm_time.tm_sec = 30;  // alarm A every minute at second 30
 
   my_rtc.set_alarm (rtc::alarm_a, &tm_time);

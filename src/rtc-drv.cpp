@@ -77,7 +77,7 @@ rtc::power (bool state)
 }
 
 /**
- * @brief  Set the RTC from a Unix time value.
+ * @brief  Set the RTC from a Unix time value; this is always UTC.
  * @param  u_time: pointer on a time_t Unix time value.
  * @return rtc::ok if successful, or a RTC error.
  */
@@ -88,7 +88,7 @@ rtc::set_time (time_t* u_time)
   RTC_DateTypeDef RTC_DateStructure;
 
   rtc::rtc_result_t result = busy;
-  struct tm *timeptr = localtime (u_time);
+  struct tm *timeptr = gmtime (u_time);
 
   RTC_TimeStructure.Seconds = timeptr->tm_sec;
   RTC_TimeStructure.Minutes = timeptr->tm_min;
@@ -117,7 +117,7 @@ rtc::set_time (time_t* u_time)
 }
 
 /**
- * @brief  Return the current RTC value as Unix time.
+ * @brief  Return the current RTC value as Unix time; this is always UTC.
  * @param  u_time: pointer on a time_t.
  * @return rtc::ok if successful, or a RTC error.
  */
@@ -151,7 +151,13 @@ rtc::get_time (time_t* u_time)
               timestruct.tm_year = RTC_DateStructure.Year + 100;
               timestruct.tm_wday = RTC_DateStructure.WeekDay - 1;
 
+              /* as we don't have the timegm () function, we do this trick
+               * to compensate for the time zone offset: remember, we work
+               * with the RTC only in UTC!
+               */
               *u_time = mktime (&timestruct);
+              *u_time -= difftime (mktime (gmtime (u_time)),
+                                   mktime (localtime (u_time)));
             }
         }
       mutex_.unlock ();
@@ -209,10 +215,12 @@ rtc::get_cal_factor (void)
 }
 
 /**
- * @brief  Set an alarm.
+ * @brief  Set an alarm. Note that alarm values must be specified in UTC!
+ *      Obviously, if the alarm definition includes only seconds and minutes,
+ *      then it makes no difference.
  * @param  which: which alarm, for the STM32F7xxx there are two alarms, one of
  *      alarm_a or alarm_b.
- * @param  when: a struct tm containing the specs for the alarm point.
+ * @param  when: a struct tm containing the alarm's specification.
  * @return rtc::ok if successful, or a RTC error.
  */
 rtc::rtc_result_t
@@ -291,5 +299,38 @@ rtc::set_alarm (int which, struct tm* when)
 
       result = (rtc_result_t) HAL_RTC_SetAlarm_IT (hrtc_, &alarm, FORMAT_BIN);
     }
+  return result;
+}
+
+rtc::rtc_result_t
+rtc::get_alarm (int which, struct tm* when)
+{
+  RTC_AlarmTypeDef alarm;
+  rtc::rtc_result_t result;
+
+  result = (rtc_result_t) HAL_RTC_GetAlarm (hrtc_, &alarm, which, FORMAT_BIN);
+
+  if (result == rtc::ok)
+    {
+      when->tm_wday =
+          (alarm.AlarmMask & RTC_ALARMMASK_DATEWEEKDAY) ?
+              alarm.AlarmDateWeekDay : alarm_ignored;
+
+      when->tm_mday =
+          (alarm.AlarmMask & RTC_ALARMDATEWEEKDAYSEL_DATE) ?
+              alarm.AlarmDateWeekDay : alarm_ignored;
+
+      when->tm_hour =
+          (alarm.AlarmMask & RTC_ALARMMASK_HOURS) ? alarm.AlarmTime.Hours : alarm_ignored;
+
+      when->tm_min =
+          (alarm.AlarmMask & RTC_ALARMMASK_MINUTES) ?
+              alarm.AlarmTime.Minutes : alarm_ignored;
+
+      when->tm_sec =
+          (alarm.AlarmMask |= RTC_ALARMMASK_SECONDS) ?
+              alarm.AlarmTime.Seconds : alarm_ignored;
+    }
+
   return result;
 }
