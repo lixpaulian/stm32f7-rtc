@@ -87,7 +87,7 @@ private:
   static constexpr uint32_t RTC_SYNC_PREDIV = 0x3FF;
 
   static constexpr uint8_t RTC_DRV_VERSION_MAJOR = 0;
-  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 5;
+  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 6;
 
   // Some timeouts; all timeouts are in # of uOS++ ticks (normally 1 ms)
   static constexpr uint32_t RTC_TIMEOUT = 100;
@@ -98,6 +98,11 @@ private:
 
 };
 
+/**
+ * @brief  Return the version of the driver.
+ * @param  version_major: major version.
+ * @param  version_minor: minor version.
+ */
 inline void
 rtc::get_version (uint8_t& version_major, uint8_t& version_minor)
 {
@@ -105,6 +110,11 @@ rtc::get_version (uint8_t& version_major, uint8_t& version_minor)
   version_minor = RTC_DRV_VERSION_MINOR;
 }
 
+/**
+ * @brief  Switch an alarm off.
+ * @param  which: which alarm, rtc::alarm_a or rtc::alarm_b.
+ * @return
+ */
 inline rtc::rtc_result_t
 rtc::reset_alarm (int which)
 {

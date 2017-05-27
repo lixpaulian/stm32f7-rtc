@@ -219,7 +219,7 @@ rtc::get_cal_factor (void)
  *      Obviously, if the alarm definition includes only seconds and minutes,
  *      then it makes no difference.
  * @param  which: which alarm, for the STM32F7xxx there are two alarms, one of
- *      alarm_a or alarm_b.
+ *      rtc::alarm_a or rtc::alarm_b.
  * @param  when: a struct tm containing the alarm's specification.
  * @return rtc::ok if successful, or a RTC error.
  */
@@ -239,6 +239,7 @@ rtc::set_alarm (int which, struct tm* when)
           // no weekday, no month-day specified, therefore mask the day
           alarm.AlarmMask |= RTC_ALARMMASK_DATEWEEKDAY;
           alarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
+          alarm.AlarmDateWeekDay = 1;   // still need a valid day here
         }
       else
         {
@@ -296,12 +297,19 @@ rtc::set_alarm (int which, struct tm* when)
       alarm.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
       alarm.AlarmTime.SubSeconds = 0;
       alarm.AlarmTime.SecondFraction = 0;
+      alarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
 
       result = (rtc_result_t) HAL_RTC_SetAlarm_IT (hrtc_, &alarm, FORMAT_BIN);
     }
   return result;
 }
 
+/**
+ * @brief  Get the values programmed for an alarm.
+ * @param  which: which alarm, rtc::alarm_a or rtc::alarm_b.
+ * @param  when: pointer to a struct tm returning the current alarm values.
+ * @return rtc::ok if successful, or a RTC error.
+ */
 rtc::rtc_result_t
 rtc::get_alarm (int which, struct tm* when)
 {
@@ -321,7 +329,8 @@ rtc::get_alarm (int which, struct tm* when)
               alarm.AlarmDateWeekDay : alarm_ignored;
 
       when->tm_hour =
-          (alarm.AlarmMask & RTC_ALARMMASK_HOURS) ? alarm.AlarmTime.Hours : alarm_ignored;
+          (alarm.AlarmMask & RTC_ALARMMASK_HOURS) ?
+              alarm.AlarmTime.Hours : alarm_ignored;
 
       when->tm_min =
           (alarm.AlarmMask & RTC_ALARMMASK_MINUTES) ?
@@ -331,6 +340,5 @@ rtc::get_alarm (int which, struct tm* when)
           (alarm.AlarmMask |= RTC_ALARMMASK_SECONDS) ?
               alarm.AlarmTime.Seconds : alarm_ignored;
     }
-
   return result;
 }

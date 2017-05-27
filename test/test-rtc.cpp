@@ -121,7 +121,7 @@ test_rtc (void)
   tm_time.tm_mday = rtc::alarm_ignored;
   tm_time.tm_min = rtc::alarm_ignored;
   tm_time.tm_wday = rtc::alarm_ignored;
-  tm_time.tm_sec = 30;  // alarm A every minute at second 30
+  tm_time.tm_sec = rtc::alarm_ignored;  // alarm A every second
 
   my_rtc.set_alarm (rtc::alarm_a, &tm_time);
 
