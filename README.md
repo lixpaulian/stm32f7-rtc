@@ -20,11 +20,13 @@ Note that the hardware initialisations (uController clock, peripherals clocks, e
 * https://github.com/micro-os-plus/eclipse-demo-projects/tree/master/f746gdiscovery-blinky-micro-os-plus
 * https://github.com/micro-os-plus/eclipse-demo-projects/tree/master/f746gdiscovery-blinky-micro-os-plus/cube-mx which details how to integrate the CubeMX generated code into a uOS++ based project.
 
-There are however several issues if using the cubeMX generator: if the RTC OSC is enabled in cubeMX, then the oscillator initialization is made in the SystemClock_Config () function (normally in cubeMX's "main.c" file"). This means that each time the system is started, the RTC clock will be restarted, which introduces a delay of several hundred of milliseconds where the RTC is not counting. Thus, after a couple of resets, the RTC may already have lost several seconds.
+There are however several issues if using the cubeMX generator: if the RTC OSC is enabled in cubeMX, then the oscillator initialization is made in the `SystemClock_Config ()` function (normally in cubeMX's "main.c" file"). This means that each time the system is started, the 32 Khz oscillator will be also restarted, which introduces a delay of several hundred of milliseconds where the RTC is not counting. Thus, after a couple of resets, the RTC may already have lost several seconds.
 
-Therefore don't enable the RTC in cubeMX. The correct initialization is done in the rtc-driver; you must however define elswhere the RTC alarm interupt (if using cubeMX the right place is in the file stm32f7xx_it.c) as below:
+Therefore don't enable the RTC in cubeMX. The correct initialization is done in the rtc-driver; you must however define elswhere the RTC alarm interrupt. If you use cubeMX, then the right place is in the stm32f7xx_it.c file in a "user code" section, as shown below:
 
 ```c
+/* USER CODE BEGIN 1 */
+
 /**
 * @brief This function handles RTC alarms (A and B) interrupt through EXTI line 17.
 */
@@ -32,12 +34,28 @@ void RTC_Alarm_IRQHandler (void)
 {
     HAL_RTC_AlarmIRQHandler (&hrtc);
 }
+
+/* USER CODE END 1 */
 ```
 
-In addition, you must add the line
+You must also define the rtc handle, and this can be done in the same file:
 
 ```c
+/* USER CODE BEGIN 0 */
+
+RTC_HandleTypeDef hrtc;
+
+/* USER CODE END 0 */
+```
+
+Finally, you must add the line
+
+```c
+/* USER CODE BEGIN Private defines */
+
 #define HAL_RTC_MODULE_ENABLED
+
+/* USER CODE END Private defines */
 ```
 
 in main.h.
@@ -54,6 +72,7 @@ There is a test that must be run on a real target. For the time being, the test 
 * Initializes the RTC
 * Optionally sets the date and time (especially useful if the hardware includes a battery backup)
 * Sets two alarms
+* Optionally de-initializes the RTC
 
 This is work in progress, more to come.
 
