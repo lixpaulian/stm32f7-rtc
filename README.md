@@ -20,9 +20,9 @@ Note that the hardware initialisations (uController clock, peripherals clocks, e
 * https://github.com/micro-os-plus/eclipse-demo-projects/tree/master/f746gdiscovery-blinky-micro-os-plus
 * https://github.com/micro-os-plus/eclipse-demo-projects/tree/master/f746gdiscovery-blinky-micro-os-plus/cube-mx which details how to integrate the CubeMX generated code into a uOS++ based project.
 
-There are however several issues if using the cubeMX generator: if the RTC OSC is enabled in cubeMX, then the oscillator initialization is made in the `SystemClock_Config ()` function (normally in cubeMX's "main.c" file"). This means that each time the system is started, the 32 Khz oscillator will be also restarted, which introduces a delay of several hundred of milliseconds where the RTC is not counting. Thus, after a couple of resets, the RTC may already have lost several seconds.
+There are however several issues if using the cubeMX generator: if the RTC OSC is enabled in cubeMX, then the oscillator initialization is made in the `SystemClock_Config ()` function (normally in cubeMX's "main.c" file"). This means that each time the system is started, the 32 Khz oscillator will be also restarted, which introduces a delay of several hundred of milliseconds whilst the RTC will not count. Thus, after a couple of resets, the RTC may already have lost several seconds.
 
-Therefore don't enable the RTC in cubeMX. The correct initialization is done in the rtc-driver; you must however define elswhere the RTC alarm interrupt. If you use cubeMX, then the right place is in the stm32f7xx_it.c file in a "user code" section, as shown below:
+Therefore don't enable the RTC in cubeMX. The correct initialization is done in the rtc-driver; you must however define elsewhere the RTC alarm interrupt handler. If you use cubeMX, then the right place is in the stm32f7xx_it.c file in a "user code" section, as shown below:
 
 ```c
 /* USER CODE BEGIN 1 */
