@@ -2,7 +2,7 @@
 This is a RTC driver for the STM32F7xx family of controllers.
 
 ## Version
-* 0.6 (27 May 2017)
+* 0.7 (4 June 2017)
 
 ## License
 * MIT
@@ -16,14 +16,36 @@ The driver depends on the following software packages, all available as _xpacks_
 * STM32F7xx HAL Library (https://github.com/xpacks/stm32f7-hal)
 * uOS++ (https://github.com/micro-os-plus/micro-os-plus-iii)
 
-Note that the hardware initialisations (uController clock, peripherals clocks, etc.) must be separately performed, normaly in, or called from the initialize_hardware.c file of a gnuarmeclipse project. You can do this using the CubeMX generator from ST. You may find helpful to check the following projects as references:
+Note that the hardware initialisations (uController clock, peripherals clocks, etc.) must be separately performed, normaly in, or called from the initialize_hardware.c file of a gnuarmeclipse project. You may also do this using the CubeMX generator from ST. You may find helpful to check the following projects as references:
 * https://github.com/micro-os-plus/eclipse-demo-projects/tree/master/f746gdiscovery-blinky-micro-os-plus
 * https://github.com/micro-os-plus/eclipse-demo-projects/tree/master/f746gdiscovery-blinky-micro-os-plus/cube-mx which details how to integrate the CubeMX generated code into a uOS++ based project.
+
+There are however several issues if using the cubeMX generator: if the RTC OSC is enabled in cubeMX, then the oscillator initialization is made in the SystemClock_Config () function (normally in cubeMX's "main.c" file"). This means that each time the system is started, the RTC clock will be restarted, which introduces a delay of several hundred of milliseconds where the RTC is not counting. Thus, after a couple of resets, the RTC may already have lost several seconds.
+
+Therefore don't enable the RTC in cubeMX. The correct initialization is done in the rtc-driver; you must however define elswhere the RTC alarm interupt (if using cubeMX the right place is in the file stm32f7xx_it.c) as below:
+
+```c
+/**
+* @brief This function handles RTC alarms (A and B) interrupt through EXTI line 17.
+*/
+void RTC_Alarm_IRQHandler (void)
+{
+    HAL_RTC_AlarmIRQHandler (&hrtc);
+}
+```
+
+In addition, you must add the line
+
+```c
+#define HAL_RTC_MODULE_ENABLED
+```
+
+in main.h.
 
 The driver was designed for the µOS++ ecosystem, but it can be easily ported to other RTOSes, as it uses only a mutex.
 
 ## Time Zone
-The driver assumes that all date/time information is UTC (the time_t datatype refers to UTC). This might be a problem when setting the alarms, as they +must+ be also reference to UTC. For recurring alarms set at intervals defined only in seconds and minutes this is not an issue. However, if hours, days, months are used to define alarms, then the data in the tm structure must be converted to UTC.
+The driver assumes that all date/time information is UTC (the time_t datatype refers to UTC). This might be a problem when setting the alarms, as they +must+ be also reference in UTC. For recurring alarms set at intervals defined only in seconds and minutes this is not an issue. However, if hours, days, months are used to define alarms, then the data in the tm structure must be first converted to UTC.
 
 The time zone in your application should be set using the setenv () and tzset () functions. Then all standard time functions would properly operate (localtime, gmtime, mktime, etc.). The integration to your system should be made using the gettimeofday () and settimeofday () syscall functions. For uOS++ this will follow soon.
 
