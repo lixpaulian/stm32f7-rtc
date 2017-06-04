@@ -55,23 +55,50 @@ rtc::rtc (RTC_HandleTypeDef* hrtc)
 rtc::rtc_result_t
 rtc::power (bool state)
 {
-  rtc_result_t result;
+  rtc_result_t result = rtc::ok;
+  RCC_OscInitTypeDef RCC_OscInitStruct;
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
+
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+  PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+  HAL_RCCEx_PeriphCLKConfig (&PeriphClkInitStruct);
+
+  hrtc_->Instance = RTC;
 
   if (state == true)
     {
-      hrtc_->Instance = RTC;
+      // we do a "hard" initialization only if the INITS flag is not set;
+      // with a backup battery the RTC keeps its initialization after a reset.
+      if (HAL_IS_BIT_CLR(RTC->ISR, RTC_FLAG_INITS))
+        {
+          RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE
+              | RCC_OSCILLATORTYPE_LSI;
+          RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+          RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
+          RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+          HAL_RCC_OscConfig (&RCC_OscInitStruct);
 
-      hrtc_->Init.HourFormat = RTC_HOURFORMAT_24;
-      hrtc_->Init.AsynchPrediv = RTC_ASYNC_PREDIV;
-      hrtc_->Init.SynchPrediv = RTC_SYNC_PREDIV;
-      hrtc_->Init.OutPut = RTC_OUTPUT_DISABLE;
-      hrtc_->Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
-      hrtc_->Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
-      result = (rtc_result_t) HAL_RTC_Init (hrtc_);
+          __HAL_RCC_RTC_ENABLE();
+
+          hrtc_->Init.HourFormat = RTC_HOURFORMAT_24;
+          hrtc_->Init.AsynchPrediv = RTC_ASYNC_PREDIV;
+          hrtc_->Init.SynchPrediv = RTC_SYNC_PREDIV;
+          hrtc_->Init.OutPut = RTC_OUTPUT_DISABLE;
+          hrtc_->Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+          hrtc_->Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+          result = (rtc_result_t) HAL_RTC_Init (hrtc_);
+        }
+
+      // set interrupt priority and enable alarm interrupt
+      HAL_NVIC_SetPriority ((IRQn_Type) RTC_Alarm_IRQn, 13, 0);
+      HAL_NVIC_EnableIRQ ((IRQn_Type) RTC_Alarm_IRQn);
     }
   else
     {
       result = (rtc_result_t) HAL_RTC_DeInit (hrtc_);
+      HAL_NVIC_DisableIRQ ((IRQn_Type) RTC_Alarm_IRQn);
+
+      __HAL_RCC_RTC_DISABLE();
     }
   return result;
 }

@@ -31,7 +31,7 @@
 #define INCLUDE_RTC_DRV_H_
 
 #include "cmsis_device.h"
-#include "rtc.h"
+#include "stm32f7xx_hal_rtc.h"
 
 #if defined (__cplusplus)
 
@@ -87,7 +87,7 @@ private:
   static constexpr uint32_t RTC_SYNC_PREDIV = 0x3FF;
 
   static constexpr uint8_t RTC_DRV_VERSION_MAJOR = 0;
-  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 6;
+  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 7;
 
   // Some timeouts; all timeouts are in # of uOS++ ticks (normally 1 ms)
   static constexpr uint32_t RTC_TIMEOUT = 100;
