@@ -63,7 +63,7 @@ in main.h.
 The driver was designed for the µOS++ ecosystem, but it can be easily ported to other RTOSes, as it uses only a mutex.
 
 ## Time Zone
-The driver assumes that all date/time information is UTC (the time_t datatype refers to UTC). This might be a problem when setting the alarms, as they +must+ be also reference in UTC. For recurring alarms set at intervals defined only in seconds and minutes this is not an issue. However, if hours, days, months are used to define alarms, then the data in the tm structure must be first converted to UTC.
+The driver assumes that all date/time information is UTC (the time_t datatype refers to UTC). This might be a problem when setting the alarms, as they __must__ be reference in UTC too. For recurring alarms set at intervals defined only in seconds and minutes this is not an issue. However, if hours, days, months are used to define alarms, then the data in the tm structure must be first converted to UTC.
 
 The time zone in your application should be set using the setenv () and tzset () functions. Then all standard time functions would properly operate (localtime, gmtime, mktime, etc.). The integration to your system should be made using the gettimeofday () and settimeofday () syscall functions. For uOS++ this will follow soon.
 
