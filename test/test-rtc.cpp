@@ -38,7 +38,8 @@
 #include "io.h"
 #endif
 
-//#define SET_CLOCK
+#define SET_CLOCK false
+#define DEINIT_RTC false
 
 extern "C"
 {
@@ -60,13 +61,19 @@ led blue
 void
 HAL_RTC_AlarmAEventCallback (RTC_HandleTypeDef *hrtc __attribute__ ((unused)))
 {
+#if defined M717
   red.toggle ();
+#endif
+  trace::printf("Alarm A\n");
 }
 
 void
 HAL_RTCEx_AlarmBEventCallback (RTC_HandleTypeDef *hrtc __attribute__ ((unused)))
 {
+#if defined M717
   blue.toggle ();
+#endif
+  trace::printf("Alarm B\n");
 }
 
 /**
@@ -93,7 +100,7 @@ test_rtc (void)
   else
     trace::printf ("RTC power-up failed (%d)\n", result);
 
-#ifdef SET_CLOCK
+#if SET_CLOCK == true
   tm_time.tm_year = 117;
   tm_time.tm_mon = 3;
   tm_time.tm_mday = 17;
@@ -128,7 +135,7 @@ test_rtc (void)
   tm_time.tm_sec = 0;   // alarm B every minute at second 0
   my_rtc.set_alarm (rtc::alarm_b, &tm_time);
 
-#if 0
+#if DEINIT_RTC == true
   // This section is only for testing, but if you enable it be aware that
   // it will erase the RTC values. The date/time will be also lost.
   if ((result = my_rtc.power (false)) == rtc::ok)
