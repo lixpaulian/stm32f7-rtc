@@ -120,6 +120,7 @@ rtc::set_time (time_t* u_time)
   RTC_TimeStructure.Seconds = timeptr->tm_sec;
   RTC_TimeStructure.Minutes = timeptr->tm_min;
   RTC_TimeStructure.Hours = timeptr->tm_hour;
+  RTC_TimeStructure.TimeFormat = RTC_HOURFORMAT_24;
   RTC_TimeStructure.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
   RTC_TimeStructure.StoreOperation = RTC_STOREOPERATION_SET;
   RTC_TimeStructure.SubSeconds = 0;

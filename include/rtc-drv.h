@@ -33,6 +33,8 @@
 #include "cmsis_device.h"
 #include "stm32f7xx_hal_rtc.h"
 
+#include <cmsis-plus/rtos/os.h>
+
 #if defined (__cplusplus)
 
 class rtc
