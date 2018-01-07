@@ -12,9 +12,6 @@ do_add_stm32f7_rtc_xpack() {
 
   do_select_pack_folder "lix/${pack_name}.git"
 
-  do_prepare_dest "${pack_name}/include"
-  do_add_content "${pack_folder}/include"/* 
-
   do_prepare_dest "${pack_name}/src"
   do_add_content "${pack_folder}/src"/* 
 }
