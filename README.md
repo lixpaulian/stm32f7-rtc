@@ -2,7 +2,7 @@
 This is a RTC driver for the STM32F7xx family of controllers.
 
 ## Version
-* 0.7 (4 June 2017)
+* 1.0 (5 February 2018)
 
 ## License
 * MIT
@@ -74,5 +74,4 @@ A test is also provided as example. The test was compiled and run on the STM32F7
 * Sets two alarms: one every second, the other every minute at second 0
 * Optionally de-initializes the RTC
 
-This is work in progress, more to come.
 
