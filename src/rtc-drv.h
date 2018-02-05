@@ -1,7 +1,7 @@
 /*
  * rtc-drv.h
  *
- * Copyright (c) 2017 Lix N. Paulian (lix@paulian.net)
+ * Copyright (c) 2017, 2018 Lix N. Paulian (lix@paulian.net)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -88,11 +88,12 @@ private:
   static constexpr uint32_t RTC_ASYNC_PREDIV = 0x1F;
   static constexpr uint32_t RTC_SYNC_PREDIV = 0x3FF;
 
-  static constexpr uint8_t RTC_DRV_VERSION_MAJOR = 0;
-  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 7;
+  static constexpr uint8_t RTC_DRV_VERSION_MAJOR = 1;
+  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 0;
 
-  // Some timeouts; all timeouts are in # of uOS++ ticks (normally 1 ms)
-  static constexpr uint32_t RTC_TIMEOUT = 100;
+  // The mutex timeout is set to 100 ms
+  static constexpr uint32_t RTC_TIMEOUT = 100 * 1000
+      / os::rtos::sysclock.frequency_hz;
 
   RTC_HandleTypeDef* hrtc_;
   os::rtos::mutex mutex_
