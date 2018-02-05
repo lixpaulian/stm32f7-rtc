@@ -1,7 +1,7 @@
 /*
  * rtc-drv.cpp
  *
- * Copyright (c) 2017 Lix N. Paulian (lix@paulian.net)
+ * Copyright (c) 2017, 2018 Lix N. Paulian (lix@paulian.net)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -113,17 +113,19 @@ rtc::set_time (time_t* u_time)
 {
   RTC_TimeTypeDef RTC_TimeStructure;
   RTC_DateTypeDef RTC_DateStructure;
-
   rtc::rtc_result_t result = busy;
-  struct tm *timeptr = gmtime (u_time);
+  struct tm tms, *timeptr;
 
-  RTC_TimeStructure.Seconds = timeptr->tm_sec;
-  RTC_TimeStructure.Minutes = timeptr->tm_min;
-  RTC_TimeStructure.Hours = timeptr->tm_hour;
+  timeptr = gmtime_r (u_time, &tms);
+
   RTC_TimeStructure.TimeFormat = RTC_HOURFORMAT_24;
   RTC_TimeStructure.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
   RTC_TimeStructure.StoreOperation = RTC_STOREOPERATION_SET;
   RTC_TimeStructure.SubSeconds = 0;
+
+  RTC_TimeStructure.Seconds = timeptr->tm_sec;
+  RTC_TimeStructure.Minutes = timeptr->tm_min;
+  RTC_TimeStructure.Hours = timeptr->tm_hour;
 
   RTC_DateStructure.Date = timeptr->tm_mday;
   RTC_DateStructure.Month = timeptr->tm_mon + 1;
@@ -154,9 +156,8 @@ rtc::get_time (time_t* u_time)
 {
   RTC_TimeTypeDef RTC_TimeStructure;
   RTC_DateTypeDef RTC_DateStructure;
-  struct tm timestruct;
-
   rtc::rtc_result_t result = busy;
+  struct tm timestruct, tmp;
 
   memset (&timestruct, 0, sizeof(struct tm));
 
@@ -184,8 +185,8 @@ rtc::get_time (time_t* u_time)
                * with the RTC only in UTC!
                */
               *u_time = mktime (&timestruct);
-              *u_time -= difftime (mktime (gmtime (u_time)),
-                                   mktime (localtime (u_time)));
+              *u_time -= difftime (mktime (gmtime_r (u_time, &tmp)),
+                                   mktime (localtime_r (u_time, &tmp)));
             }
         }
       mutex_.unlock ();
@@ -333,7 +334,7 @@ rtc::set_alarm (int which, struct tm* when)
 }
 
 /**
- * @brief  Get the values programmed for an alarm.
+ * @brief  Get the current values of an alarm.
  * @param  which: which alarm, rtc::alarm_a or rtc::alarm_b.
  * @param  when: pointer to a struct tm returning the current alarm values.
  * @return rtc::ok if successful, or a RTC error.
