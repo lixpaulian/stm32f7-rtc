@@ -371,3 +371,25 @@ rtc::get_alarm (int which, struct tm* when)
     }
   return result;
 }
+
+/**
+ * @brief Read a backup register.
+ * @param reg_nr: the number of the register to read (0 to 31).
+ * @return Value read out of the specified register.
+ */
+uint32_t
+rtc::get_bk_register (uint8_t reg_nr)
+{
+  return HAL_RTCEx_BKUPRead(hrtc_, reg_nr);
+}
+
+/**
+ * @brief Write a backup register.
+ * @param reg_nr: the number of the register to write (0 to 31).
+ * @param value: Value to be written in the specified register.
+ */
+void
+rtc::set_bk_register (uint8_t reg_nr, uint32_t value)
+{
+  HAL_RTCEx_BKUPWrite (hrtc_, reg_nr, value);
+}

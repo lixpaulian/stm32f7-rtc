@@ -84,12 +84,18 @@ public:
   rtc_result_t
   reset_alarm (int which);
 
+  uint32_t
+  get_bk_register (uint8_t reg_nr);
+
+  void
+  set_bk_register (uint8_t reg_nr, uint32_t value);
+
 private:
   static constexpr uint32_t RTC_ASYNC_PREDIV = 0x1F;
   static constexpr uint32_t RTC_SYNC_PREDIV = 0x3FF;
 
   static constexpr uint8_t RTC_DRV_VERSION_MAJOR = 1;
-  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 0;
+  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 1;
 
   // The mutex timeout is set to 100 ms
   static constexpr uint32_t RTC_TIMEOUT = 100 * 1000
