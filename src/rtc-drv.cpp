@@ -321,7 +321,7 @@ rtc::set_alarm (int which, struct tm* when)
 
       // initialize the rest
       alarm.Alarm = which;
-      alarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_NONE;
+      alarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
       alarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
       alarm.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
       alarm.AlarmTime.SubSeconds = 0;
