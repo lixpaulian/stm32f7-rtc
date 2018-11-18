@@ -2,7 +2,7 @@
 This is a RTC driver for the STM32F7xx family of controllers.
 
 ## Version
-* 1.1 (8 October 2018)
+* 1.2 (18 November 2018)
 
 ## License
 * MIT
@@ -22,43 +22,9 @@ Note that the hardware initialisations (uController clock, peripherals clocks, e
 
 There are however several issues if using the cubeMX generator: if the RTC OSC is enabled in cubeMX, then the oscillator initialization is made in the `SystemClock_Config ()` function (normally in cubeMX's "main.c" file"). This means that each time the system is started, the 32 Khz oscillator will be also restarted, which introduces a delay of several hundred of milliseconds whereas the RTC will not count. Thus, after a couple of resets, the RTC may already have lost several seconds.
 
-Therefore don't enable the RTC in cubeMX. The correct initialization is done in the rtc-driver; you must however define elsewhere the RTC alarm interrupt handler. If you use cubeMX, then the right place is in the stm32f7xx_it.c file in a "user code" section, as shown below:
+The solution is to enable the RTC in CubeMX, but don't generate the function call at start-up: check the `MX_RTC_INIT` checkbox in Project -> Settings...-> Advanced Settings. The corect initialization is done in the rtc-driver (`power ()`), that you may call in your program at start-up; everything else is done by the CubeMX.
 
-```c
-/* USER CODE BEGIN 1 */
-
-/**
-* @brief This function handles RTC alarms (A and B) interrupt through EXTI line 17.
-*/
-void RTC_Alarm_IRQHandler (void)
-{
-    HAL_RTC_AlarmIRQHandler (&hrtc);
-}
-
-/* USER CODE END 1 */
-```
-
-You must also define the rtc handle, and this can be done in the same file:
-
-```c
-/* USER CODE BEGIN 0 */
-
-RTC_HandleTypeDef hrtc;
-
-/* USER CODE END 0 */
-```
-
-Finally, you must add the line
-
-```c
-/* USER CODE BEGIN Private defines */
-
-#define HAL_RTC_MODULE_ENABLED
-
-/* USER CODE END Private defines */
-```
-
-in main.h.
+You may also need to implement the alarm and wake-up call-back functions. These calls are defined as weak in HAL and can be overriden by your own implementations.
 
 The driver was designed for the µOS++ ecosystem, but it can be easily ported to other RTOSes, as it uses only a mutex.
 
