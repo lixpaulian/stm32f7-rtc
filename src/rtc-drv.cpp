@@ -50,7 +50,7 @@ rtc::rtc (RTC_HandleTypeDef* hrtc)
 /**
  * @brief  Control the power state of the RTC peripheral.
  * @param  state: new state, either true (power on) or false (power off).
- * @return rtc::ok if successful, or a RTC error.
+ * @return rtc::ok if successful, or an RTC error.
  */
 rtc::rtc_result_t
 rtc::power (bool state)
@@ -62,6 +62,9 @@ rtc::power (bool state)
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
   PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
   HAL_RCCEx_PeriphCLKConfig (&PeriphClkInitStruct);
+
+  // this may be changed depending on the LSE crystal
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_MEDIUMLOW);
 
   hrtc_->Instance = RTC;
 
@@ -90,13 +93,18 @@ rtc::power (bool state)
         }
 
       // set interrupt priority and enable alarm interrupt
-      HAL_NVIC_SetPriority ((IRQn_Type) RTC_Alarm_IRQn, 13, 0);
-      HAL_NVIC_EnableIRQ ((IRQn_Type) RTC_Alarm_IRQn);
+      HAL_NVIC_SetPriority (RTC_Alarm_IRQn, 13, 0);
+      HAL_NVIC_EnableIRQ (RTC_Alarm_IRQn);
+
+      // set interrupt priority and enable wake-up interrupt
+      HAL_NVIC_SetPriority (RTC_WKUP_IRQn, 13, 0);
+      HAL_NVIC_EnableIRQ (RTC_WKUP_IRQn);
     }
   else
     {
       result = (rtc_result_t) HAL_RTC_DeInit (hrtc_);
-      HAL_NVIC_DisableIRQ ((IRQn_Type) RTC_Alarm_IRQn);
+      HAL_NVIC_DisableIRQ (RTC_Alarm_IRQn);
+      HAL_NVIC_DisableIRQ (RTC_WKUP_IRQn);
 
       __HAL_RCC_RTC_DISABLE();
     }
@@ -106,7 +114,7 @@ rtc::power (bool state)
 /**
  * @brief  Set the RTC from a Unix time value; this is always UTC.
  * @param  u_time: pointer on a time_t Unix time value.
- * @return rtc::ok if successful, or a RTC error.
+ * @return rtc::ok if successful, or an RTC error.
  */
 rtc::rtc_result_t
 rtc::set_time (time_t* u_time)
@@ -149,7 +157,7 @@ rtc::set_time (time_t* u_time)
 /**
  * @brief  Return the current RTC value as Unix time; this is always UTC.
  * @param  u_time: pointer on a time_t.
- * @return rtc::ok if successful, or a RTC error.
+ * @return rtc::ok if successful, or an RTC error.
  */
 rtc::rtc_result_t
 rtc::get_time (time_t* u_time)
@@ -197,7 +205,7 @@ rtc::get_time (time_t* u_time)
 /**
  * @brief  Set the calibration factor.
  * @param  cal_factor: calibration factor (from -511 to +512).
- * @return rtc::ok if successful, or a RTC error.
+ * @return rtc::ok if successful, or an RTC error.
  */
 rtc::rtc_result_t
 rtc::set_cal_factor (int cal_factor)
@@ -250,7 +258,7 @@ rtc::get_cal_factor (void)
  * @param  which: which alarm, for the STM32F7xxx there are two alarms, one of
  *      rtc::alarm_a or rtc::alarm_b.
  * @param  when: a struct tm containing the alarm's specification.
- * @return rtc::ok if successful, or a RTC error.
+ * @return rtc::ok if successful, or an RTC error.
  */
 rtc::rtc_result_t
 rtc::set_alarm (int which, struct tm* when)
@@ -337,7 +345,7 @@ rtc::set_alarm (int which, struct tm* when)
  * @brief  Get the current values of an alarm.
  * @param  which: which alarm, rtc::alarm_a or rtc::alarm_b.
  * @param  when: pointer to a struct tm returning the current alarm values.
- * @return rtc::ok if successful, or a RTC error.
+ * @return rtc::ok if successful, or an RTC error.
  */
 rtc::rtc_result_t
 rtc::get_alarm (int which, struct tm* when)
@@ -373,6 +381,26 @@ rtc::get_alarm (int which, struct tm* when)
 }
 
 /**
+ * @brief Set the wake-up timer.
+ * @param seconds: number of seconds until an interrupt will be triggered.
+ * @return rtc::ok if successful, or an RTC error.
+ */
+rtc::rtc_result_t
+rtc::set_wakeup (uint16_t seconds)
+{
+  rtc::rtc_result_t result = rtc::invalid_param;
+
+  if (seconds)
+    {
+      HAL_RTCEx_DeactivateWakeUpTimer (hrtc_);
+      result = (rtc_result_t) HAL_RTCEx_SetWakeUpTimer_IT (hrtc_, seconds - 1,
+      RTC_WAKEUPCLOCK_CK_SPRE_16BITS);
+    }
+
+  return result;
+}
+
+/**
  * @brief Read a backup register.
  * @param reg_nr: the number of the register to read (0 to 31).
  * @return Value read out of the specified register.
@@ -380,7 +408,7 @@ rtc::get_alarm (int which, struct tm* when)
 uint32_t
 rtc::get_bk_register (uint8_t reg_nr)
 {
-  return HAL_RTCEx_BKUPRead(hrtc_, reg_nr);
+  return HAL_RTCEx_BKUPRead (hrtc_, reg_nr);
 }
 
 /**

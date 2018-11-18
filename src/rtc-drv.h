@@ -31,7 +31,6 @@
 #define INCLUDE_RTC_DRV_H_
 
 #include "cmsis_device.h"
-#include "stm32f7xx_hal_rtc.h"
 
 #include <cmsis-plus/rtos/os.h>
 
@@ -84,6 +83,9 @@ public:
   rtc_result_t
   reset_alarm (int which);
 
+  rtc_result_t
+  set_wakeup (uint16_t seconds);
+
   uint32_t
   get_bk_register (uint8_t reg_nr);
 
@@ -95,7 +97,7 @@ private:
   static constexpr uint32_t RTC_SYNC_PREDIV = 0x3FF;
 
   static constexpr uint8_t RTC_DRV_VERSION_MAJOR = 1;
-  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 1;
+  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 2;
 
   // The mutex timeout is set to 100 ms
   static constexpr uint32_t RTC_TIMEOUT = 100 * 1000
