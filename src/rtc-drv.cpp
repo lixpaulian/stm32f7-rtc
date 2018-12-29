@@ -64,7 +64,7 @@ rtc::power (bool state)
   HAL_RCCEx_PeriphCLKConfig (&PeriphClkInitStruct);
 
   // this may be changed depending on the LSE crystal
-  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_MEDIUMLOW);
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_MEDIUMHIGH);
 
   hrtc_->Instance = RTC;
 
