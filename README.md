@@ -2,7 +2,7 @@
 This is a RTC driver for the STM32F7xx family of controllers.
 
 ## Version
-* 1.2 (18 November 2018)
+* 1.2.0 (19 January 2020)
 
 ## License
 * MIT

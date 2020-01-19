@@ -1,7 +1,7 @@
 /*
  * rtc-drv.h
  *
- * Copyright (c) 2017, 2018 Lix N. Paulian (lix@paulian.net)
+ * Copyright (c) 2017, 2018, 2020 Lix N. Paulian (lix@paulian.net)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -57,7 +57,7 @@ public:
   static constexpr int alarm_ignored = -1;
 
   void
-  get_version (uint8_t& version_major, uint8_t& version_minor);
+  get_version (uint8_t& version_major, uint8_t& version_minor, uint8_t& version_patch);
 
   rtc_result_t
   power (bool state);
@@ -96,8 +96,9 @@ private:
   static constexpr uint32_t RTC_ASYNC_PREDIV = 0x1F;
   static constexpr uint32_t RTC_SYNC_PREDIV = 0x3FF;
 
-  static constexpr uint8_t RTC_DRV_VERSION_MAJOR = 1;
-  static constexpr uint8_t RTC_DRV_VERSION_MINOR = 2;
+  static constexpr uint8_t VERSION_MAJOR = 1;
+  static constexpr uint8_t VERSION_MINOR = 2;
+  static constexpr uint8_t VERSION_PATCH = 0;
 
   // The mutex timeout is set to 100 ms
   static constexpr uint32_t RTC_TIMEOUT = 100 * 1000
@@ -115,10 +116,11 @@ private:
  * @param  version_minor: minor version.
  */
 inline void
-rtc::get_version (uint8_t& version_major, uint8_t& version_minor)
+rtc::get_version (uint8_t& version_major, uint8_t& version_minor, uint8_t& version_patch)
 {
-  version_major = RTC_DRV_VERSION_MAJOR;
-  version_minor = RTC_DRV_VERSION_MINOR;
+  version_major = VERSION_MAJOR;
+  version_minor = VERSION_MINOR;
+  version_patch = VERSION_PATCH;
 }
 
 /**

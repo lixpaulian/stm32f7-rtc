@@ -1,7 +1,7 @@
 /*
  * test-rtc.cpp
  *
- * Copyright (c) 2017 Lix N. Paulian (lix@paulian.net)
+ * Copyright (c) 2017, 2020 Lix N. Paulian (lix@paulian.net)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -83,7 +83,7 @@ void
 test_rtc (void)
 {
   rtc::rtc_result_t result;
-  uint8_t version_major, version_minor;
+  uint8_t version_major, version_minor, version_patch;
   time_t clock;
   struct tm tm_time;
 
@@ -92,8 +92,8 @@ test_rtc (void)
   blue.power_up ();
 #endif
 
-  my_rtc.get_version (version_major, version_minor);
-  trace::printf ("RTC driver version: %d.%d\n", version_major, version_minor);
+  my_rtc.get_version (version_major, version_minor, version_patch);
+  trace::printf ("RTC driver version: %d.%d.%d\n", version_major, version_minor, version_patch);
 
   if ((result = my_rtc.power (true)) == rtc::ok)
     trace::printf ("RTC powered up\n");
