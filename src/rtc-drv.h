@@ -57,7 +57,8 @@ public:
   static constexpr int alarm_ignored = -1;
 
   void
-  get_version (uint8_t& version_major, uint8_t& version_minor, uint8_t& version_patch);
+  get_version (uint8_t& version_major, uint8_t& version_minor,
+               uint8_t& version_patch);
 
   rtc_result_t
   power (bool state);
@@ -116,7 +117,8 @@ private:
  * @param  version_minor: minor version.
  */
 inline void
-rtc::get_version (uint8_t& version_major, uint8_t& version_minor, uint8_t& version_patch)
+rtc::get_version (uint8_t& version_major, uint8_t& version_minor,
+                  uint8_t& version_patch)
 {
   version_major = VERSION_MAJOR;
   version_minor = VERSION_MINOR;
