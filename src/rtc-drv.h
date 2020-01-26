@@ -99,7 +99,7 @@ private:
 
   static constexpr uint8_t VERSION_MAJOR = 1;
   static constexpr uint8_t VERSION_MINOR = 2;
-  static constexpr uint8_t VERSION_PATCH = 0;
+  static constexpr uint8_t VERSION_PATCH = 1;
 
   // The mutex timeout is set to 100 ms
   static constexpr uint32_t RTC_TIMEOUT = 100 * 1000
