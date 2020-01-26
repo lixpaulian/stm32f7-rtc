@@ -63,9 +63,6 @@ rtc::power (bool state)
   PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
   HAL_RCCEx_PeriphCLKConfig (&PeriphClkInitStruct);
 
-  // this may be changed depending on the LSE crystal
-  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_MEDIUMHIGH);
-
   hrtc_->Instance = RTC;
 
   if (state == true)
