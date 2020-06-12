@@ -89,6 +89,10 @@ rtc::power (bool state)
           result = (rtc_result_t) HAL_RTC_Init (hrtc_);
         }
 
+      // deactivate tamper detection on all pins
+      HAL_RTCEx_DeactivateTamper (hrtc_, //
+          RTC_TAMPER_1 | RTC_TAMPER_2 | RTC_TAMPER_3);
+
       // set interrupt priority and enable alarm interrupt
       HAL_NVIC_SetPriority (RTC_Alarm_IRQn, 13, 0);
       HAL_NVIC_EnableIRQ (RTC_Alarm_IRQn);
@@ -119,7 +123,7 @@ rtc::set_time (time_t* u_time)
   RTC_TimeTypeDef RTC_TimeStructure;
   RTC_DateTypeDef RTC_DateStructure;
   rtc::rtc_result_t result = busy;
-  struct tm tms, *timeptr;
+  struct tm tms, * timeptr;
 
   timeptr = gmtime_r (u_time, &tms);
 
