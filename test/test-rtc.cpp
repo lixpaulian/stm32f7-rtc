@@ -32,6 +32,7 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 
+#include "rtc.h"
 #include "rtc-drv.h"
 
 #if defined M717
@@ -40,11 +41,6 @@
 
 #define SET_CLOCK false
 #define DEINIT_RTC false
-
-extern "C"
-{
-  RTC_HandleTypeDef hrtc;
-}
 
 using namespace os;
 
@@ -59,21 +55,21 @@ led blue
 #endif
 
 void
-HAL_RTC_AlarmAEventCallback (RTC_HandleTypeDef *hrtc __attribute__ ((unused)))
+HAL_RTC_AlarmAEventCallback (RTC_HandleTypeDef* hrtc __attribute__ ((unused)))
 {
 #if defined M717
   red.toggle ();
 #endif
-  trace::printf("Alarm A\n");
+  trace::printf ("Alarm A\n");
 }
 
 void
-HAL_RTCEx_AlarmBEventCallback (RTC_HandleTypeDef *hrtc __attribute__ ((unused)))
+HAL_RTCEx_AlarmBEventCallback (RTC_HandleTypeDef* hrtc __attribute__ ((unused)))
 {
 #if defined M717
   blue.toggle ();
 #endif
-  trace::printf("Alarm B\n");
+  trace::printf ("Alarm B\n");
 }
 
 /**
@@ -93,7 +89,8 @@ test_rtc (void)
 #endif
 
   my_rtc.get_version (version_major, version_minor, version_patch);
-  trace::printf ("RTC driver version: %d.%d.%d\n", version_major, version_minor, version_patch);
+  trace::printf ("RTC driver version: %d.%d.%d\n", version_major, version_minor,
+                 version_patch);
 
   if ((result = my_rtc.power (true)) == rtc::ok)
     trace::printf ("RTC powered up\n");
