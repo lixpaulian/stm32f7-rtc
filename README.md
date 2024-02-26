@@ -26,7 +26,7 @@ The driver depends on the following software packages, all available as xPacks:
 * STM32F7xx HAL Library (https://github.com/xpacks/stm32f7-hal)
 * µOS++ (https://github.com/micro-os-plus/micro-os-plus-iii)
 
-Note that the hardware initialisations (µController clock, peripherals clocks, etc.) must be separately performed, normaly in, or called from the initialize_hardware.c file of a gnuarmeclipse project. You may also do this using the CubeMX generator from ST. You may find helpful to check the following projects as references:
+Note that the hardware initialisations (µController clock, peripherals clocks, etc.) must be separately performed, normaly in, or called from the `initialize_hardware.c` file of a GNU MCU Eclipse project. You may also do this using the CubeMX generator from ST (recommended, as the STM32xxx xPacks will probably be discontinued). You may find helpful to check the following projects as references:
 * https://github.com/micro-os-plus/eclipse-demo-projects/tree/master/f746gdiscovery-blinky-micro-os-plus
 * https://github.com/micro-os-plus/eclipse-demo-projects/tree/master/f746gdiscovery-blinky-micro-os-plus/cube-mx which details how to integrate the CubeMX generated code into a µOS++ based project.
 
