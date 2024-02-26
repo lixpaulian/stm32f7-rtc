@@ -3,13 +3,7 @@
 ![GitHub License](https://img.shields.io/github/license/lixpaulian/stm32f7-rtc)
 
 # stm32f7-rtc
-This is a RTC driver for the STM32F7xx family of controllers.
-
-## Version
-* 1.2.2 (12 June 2020)
-
-## License
-* MIT
+This is an RTC driver for the STM32F7xx family of controllers.
 
 ## Package
 The class is provided as an **xPack** (for more details on xPacks see https://xpack.github.io). It can be installed in a project using either `xpm` or the attached script. Of course, it can be installed without using the xPacks tools, either by linking the class as a Git submodule or by copying it in your project, but then updating it later might be more difficult.
